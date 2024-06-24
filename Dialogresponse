@@ -1,0 +1,149 @@
+public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
+{
+    if(dialogid == DIALOG_COMMANDS)
+    {
+        if(response)
+        {
+            switch(listitem)
+            {
+                case 0:
+                {
+                    new pDialog[256 * 10];
+                    strcat(pDialog, ""COL_LIGHTBLUE"/commands -> {FFFFFF}Shows you the list of server's command.\n"COL_LIGHTBLUE"/help ->{FFFFFF} Gives you the basic of how to play in the server.\n"COL_LIGHTBLUE"/ask (Question) -> {FFFFFF}To ask question to the online administrators.\n",sizeof(pDialog));
+                    strcat(pDialog, ""COL_LIGHTBLUE"/kill -> {FFFFFF}Kills yourself, you must not have a wanted level.\n"COL_LIGHTBLUE"/rules -> {FFFFFF}Shows you the list of server's rules.\n"COL_LIGHTBLUE"/afk -> {FFFFFF}Go to the AFK state.\n"COL_LIGHTBLUE"/back -> {FFFFFF}Back from AFK state.\n",sizeof(pDialog));
+                    strcat(pDialog, ""COL_LIGHTBLUE"/vips -> {FFFFFF}Shows you the list of online V.I.Ps.\n"COL_LIGHTBLUE"/admins -> {FFFFFF}Shows you the list of online Administrators.\n"COL_LIGHTBLUE"/pay (Player ID) (Amount) -> {FFFFFF}Give the specific players your cash.\n",sizeof(pDialog));
+                    strcat(pDialog, ""COL_LIGHTBLUE"/stats -> {FFFFFF}View your statistic, to see other player's you can click on their name in Tab.\n"COL_LIGHTBLUE"/report (Player ID) (Reason) -> {FFFFFF}Reports a specific players for a reason.\n",sizeof(pDialog));
+                    strcat(pDialog, ""COL_LIGHTBLUE"/cw (Message) -> {FFFFFF}Sends a car whisper to players in your vehicle.\n"COL_LIGHTBLUE"/pm (Player ID) (Message) -> {FFFFFF}Sends a private messages to a specific players.\n"COL_LIGHTBLUE"/changename (New Name) -> {FFFFFF}To change your ingame name, fee 500k.\n",sizeof(pDialog));
+                    strcat(pDialog, ""COL_LIGHTBLUE"/r (Message) ->{FFFFFF} Reply to your last private message.\n"COL_LIGHTBLUE"/nopm -> {FFFFFF}Rejects all incoming private messages.",sizeof(pDialog));
+                    ShowPlayerDialog(playerid, DIALOG_COMMANDS, DIALOG_STYLE_MSGBOX, ""COL_YELLOW"General Commands", pDialog, "Close", "");
+                }
+                case 1:
+                {
+                    if(pInfo[playerid][pVIP] < 1)
+                        return SendClientMessage(playerid, -1, "{FF0000}[VIP] You are not authorized to use this command.");
+                    new combine[256 * 10];
+
+                    if(pInfo[playerid][pVIP] >= 1)
+                    {
+                        strcat(combine, "{375FFF}Bronze V.I.P:\n");
+                        strcat(combine, ""COL_LIGHTBLUE"/viptag - {FFFFFF}Toggle your VIP Tag.\n"COL_LIGHTBLUE"/vrepair - {FFFFFF}Repair your vehicles for free.\n"COL_LIGHTBLUE"/vcar - {FFFFFF}Spawn an Infernus in your location.\n");
+                        strcat(combine, "{FF0000}* VIP Chat: ! (Ex: !Hello)\n\n");
+                    }
+                    if(pInfo[playerid][pVIP] >= 2)
+                    {
+                        strcat(combine, "{375FFF}Gold V.I.P:\n");
+                        strcat(combine, ""COL_LIGHTBLUE"/vheal - {FFFFFF}Heals yourself for free.\n\n");
+                    }
+                    if(pInfo[playerid][pVIP] >= 3)
+                    {
+                        strcat(combine, "{375FFF}Diamond V.I.P:\n");
+                        strcat(combine, "Coming Soon\n");
+                    }
+
+                    ShowPlayerDialog(playerid, DIALOG_BLANK, DIALOG_STYLE_MSGBOX, "VIP Commands", combine, "CLOSE", "");
+                }
+            }
+            return 1;
+        }
+    }
+    if(dialogid == DIALOG_REGISTER)
+    {
+        new file[128], name[MAX_PLAYER_NAME], str[1024];
+        GetPlayerName(playerid, name, MAX_PLAYER_NAME);
+        format(file, sizeof(file), "SFGWL/Accounts/%s.ini", name);
+        if(response)
+        {
+            if(!strlen(inputtext))
+            {
+                format(str,sizeof str,"{FFFFFF}Hello "COL_YELLOW"%s{FFFFFF}.\n\nPlease insert your password to register your account.\n\n• You will need atleast 5 characters for your password\n• Remember, don't give your password to other people the administrator team will not ask for your password.\n• Don't leave your password blank!\n\nIf you are not a member of our "COL_BLUE2"Discord{FFFFFF}, feel free to join: "COL_BLUE2"www.discord.gg/pwWQF3k{FFFFFF}.", GetName(playerid), playerid);
+                ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_INPUT, "Account Register", str,"Register","Quit");
+            }
+            dini_Create(file);
+            dini_IntSet(file, "Password", num_hash(inputtext));
+            dini_IntSet(file, "AdminLevel", pInfo[playerid][pAdmin] = 0);
+            dini_IntSet(file, "VIPLevel", pInfo[playerid][pVIP] = 0);
+            dini_IntSet(file, "Cash", pInfo[playerid][pCash] = 0);
+            dini_IntSet(file, "Score", pInfo[playerid][pScore] = 0);
+            dini_IntSet(file, "Kills", pInfo[playerid][pKills] = 0);
+            dini_IntSet(file, "Deaths", pInfo[playerid][pDeaths] = 0);
+            dini_Set(file, "IP", GetPlayerIP2(playerid));
+            dini_IntSet(file, "LoyaltyPoints", pInfo[playerid][pLoyalty] = 0);
+            dini_IntSet(file, "Hours", pInfo[playerid][pHours] = 0);
+            dini_IntSet(file, "Minutes", pInfo[playerid][pMinutes] = 0);
+            dini_IntSet(file, "Second", pInfo[playerid][pSecond] = 0);
+            pInfo[playerid][pLogged] = 1;
+
+
+            GivePlayerCash(playerid, 10000);
+            format(str, sizeof(str), "{FFFFFF}Congratulations "COL_ORANGE"%s{FFFFFF}, you have succesfully registered in our database.", name);
+            SendClientMessage(playerid, -1, str);
+            SendClientMessage(playerid, -1, "{FFFFFF}You have received "COL_ORANGE"$10.000 {FFFFFF}in your hand as a fresh start.");
+            SendClientMessage(playerid, -1, "{C0C0C0}[SERVER] {FFFFFF}Please refer to "COL_GREY"/cmds {FFFFFF}for server commands and "COL_GREY"/rules {FFFFFF}for a good behaviour{FFFFFF}.");
+            SendClientMessage(playerid, -1, "{C0C0C0}[SERVER] {FFFFFF}Read "COL_GREY"/help {FFFFFF}for server guide, if you need any assistance feel free to use "COL_GREY"/ask (Question).");
+            SendClientMessage(playerid, -1, "{C0C0C0}[SERVER] {FFFFFF}Join our discord channel here: "COL_BLUE2"www.discord.gg/pwWQF3k{FFFFFF}.");
+        }
+        else
+        {
+            Kick(playerid);
+        }
+    }
+    if(dialogid == DIALOG_LOGIN)
+    {
+        new file[128], name[MAX_PLAYER_NAME], str[1024];
+        GetPlayerName(playerid, name, MAX_PLAYER_NAME);
+        format(file, sizeof(file), "SFGWL/Accounts/%s.ini", name);
+        if(response)
+        {
+            if(strlen(inputtext))
+            {
+                if(num_hash(inputtext) != dini_Int(file, "Password"))
+                {
+                    format(str,sizeof str,"{FFFFFF}Hello "COL_YELLOW"%s{FFFFFF}.\n\nPlease insert your password to login to your account.\n"COL_RED"You have entered an incorrect password.\n\n{FFFFFF}If you are not a member of our "COL_BLUE2"Discord{FFFFFF}, feel free to join: "COL_BLUE2"www.discord.gg/pwWQF3k{FFFFFF}.", GetName(playerid), playerid);
+                    ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_INPUT, "Account Login", str, "Login", "Cancel");
+                }
+                else
+                {
+                    pInfo[playerid][pAdmin] = dini_Int(file, "AdminLevel");
+                    pInfo[playerid][pVIP] = dini_Int(file, "VIPLevel");
+                    pInfo[playerid][pCash] = dini_Int(file, "Cash");
+                    pInfo[playerid][pScore] = dini_Int(file, "Score");
+                    pInfo[playerid][pKills] = dini_Int(file, "Kills");
+                    pInfo[playerid][pDeaths] = dini_Int(file, "Deaths");
+                    pInfo[playerid][pIP] = dini_Int(file, "IP");
+                    pInfo[playerid][pBanned] = dini_Int(file, "Banned");
+                    pInfo[playerid][pLoyalty] = dini_Int(file, "LoyaltyPoints");
+                    pInfo[playerid][pHours] = dini_Int(file, "Hours");
+                    pInfo[playerid][pMinutes] = dini_Int(file, "Minutes");
+                    pInfo[playerid][pSecond] = dini_Int(file, "Second");
+                    pInfo[playerid][pLogged] = 1;
+
+                    SetPlayerCash(playerid, pInfo[playerid][pCash]);
+                    SetPlayerScore(playerid, pInfo[playerid][pScore]);
+                    format(str, sizeof(str), "{FFFFFF}Welcome back "COL_LIGHTBLUE"%s{FFFFFF}, your status has been succesfully loaded!", name);
+                    SendClientMessage(playerid, -1, str);
+                    format(str, sizeof(str), "{FFFFFF}Admin Level: "COL_GREEN"%s {FFFFFF}- VIP Level: "COL_GREEN"%s", GetAdminName(playerid), GetVIPName(playerid));
+                    SendClientMessage(playerid, -1, str);
+                }
+            }
+        }
+        else
+        {
+            Kick(playerid);
+        }
+    }
+    if(dialogid == DIALOG_SHOP)
+    {
+        if(response)
+        {
+            if(GetPlayerCash(playerid) < WEAPON_SHOP[listitem][WEAPON_PRICE])
+            {
+                return SendClientMessage(playerid, 0xAA0000FF, ""COL_RED"[ERROR] You don't have enough money to buy this item.");
+            }
+            GivePlayerCash(playerid, -WEAPON_SHOP[listitem][WEAPON_PRICE]);
+            GivePlayerWeapon(playerid, WEAPON_SHOP[listitem][WEAPON_ID], WEAPON_SHOP[listitem][WEAPON_AMMO]);
+
+            GameTextForPlayer(playerid, "~g~Item Purchased!", 3000, 3);
+        }
+    }
+    return 1;
+}
