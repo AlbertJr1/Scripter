@@ -163,7 +163,7 @@ public OnFilterScriptInit()
 
     print("-------------------- [Indoland Voice Chat System] --------------------\
     \n===>> Berhasil dimuat dengan baik!\
-    \n===>> by: idann (Alzhidan Putra Syah)\
+    \n===>> by: Faisal (Albert Juniors)\
     \n===>> dipersembahkan untuk Indoland Roleplay\
     \n-----------------------------------------------------------------");
     return 1;
